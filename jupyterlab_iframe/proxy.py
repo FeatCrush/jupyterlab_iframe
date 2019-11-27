@@ -2,6 +2,7 @@ import tornado.gen
 import tornado.web
 import tornado.websocket
 import tornado.httpclient
+import os
 from notebook.base.handlers import IPythonHandler
 
 
@@ -12,8 +13,9 @@ class ProxyHandler(IPythonHandler):
     @tornado.gen.coroutine
     def get(self, *args):
         '''Get the login page'''
+        ca_certs = os.getenv('CA_CERTS', None)
         path = self.get_argument('path')
-        req = tornado.httpclient.HTTPRequest(path)
+        req = tornado.httpclient.HTTPRequest(path,ca_certs=ca_certs)
         client = tornado.httpclient.AsyncHTTPClient()
         ret = yield client.fetch(req, raise_error=False)
         if ret.body:
